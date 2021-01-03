@@ -1,0 +1,661 @@
+<!doctype html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<link media="all" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" type="text/css" />
+<title>Check Venba</title>
+</head>
+
+<body>
+
+  <div class="container">
+    <center><h1>Venba Check</h1></center>
+    <div class="row">
+        <div class="col-sm">
+            <button type="button" class="btn btn-primary" onclick="check_venba_text_box()">Check Venba</button>
+        </div>
+        <div class="col-sm">
+            <em>Venba Input</em>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <textarea id="SOURCE" rows="25" cols="40">
+அகர முதல எழுத்தெல்லாம் ஆதி    
+பகவன்  முதற்றே உலகு                     
+            </textarea>
+        </div>
+        <div class="col-sm" style="border-style: solid; border-width:thin; border-color: #0;" id="TARGET">
+        </div>
+    </div>
+  </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous" ></script>  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>      
+    
+    <script type="text/javascript">
+
+    function range(m){
+        let l = [];
+        for (i=0; i<m; i++){
+            l.push(i);   
+        }
+        return l;
+    }   
+
+    function range1(start, stop, increment){
+        let l = [];
+        for (i=start; i<stop; i+=increment){
+            l.push(i);   
+        }
+        return l;
+    }                
+    
+    function pairO(i,j){
+        return i*1000+j;    
+    }  
+              
+    function ntimes(s, n){
+        let l = [];
+        for (i=0;i<n;i++){
+            l.push(s);
+        }
+        return l;
+    }
+        
+    function sum(l){
+        return l.reduce(function(i,j){return i+j;}, 0);
+    } 
+        
+    function newline2br(txt){
+        return strip(txt).split('\n').join('<br/>')+"<br/>";     
+    }
+
+    function strip(s){
+        return s.replace(/^\s+|\s+$/gm, '');
+    }
+    
+    function mapget(m, key, d){
+        let r = d;
+        if (m.has(key)){
+            r = m.get(key);
+        }
+        return r;
+    } 
+    
+    function lists_to_map(l1, l2) {
+        let d = new Map();
+        for(i=0;i<l1.length;i++){
+            d.set(l1[i], l2[i]);
+        }
+        return d;
+    }    
+                    
+    
+    function transliterate_text(map, data) {
+        let tokenset = new Set(map.keys());
+        let maxlen = 1;  
+        for(let l of map.keys()) {
+            maxlen = Math.max(maxlen, l.length);  
+        }
+        let current = 0;
+        let tokenlist = [];
+        while (current < data.length) {
+            let nextstr = data.slice(current, current+maxlen);
+            let p = nextstr.slice(0, 1);
+            let j = 1;
+            for (let i = maxlen; i > 1; i -= 1) {
+                let s = nextstr.slice(0, i);
+                if (tokenset.has(s)) {
+                    p = s;
+                    j = i;
+                    break
+                }
+            }
+            p = mapget(map, p, p);
+            tokenlist.push(p);
+            current += j;
+        }
+        return tokenlist;
+    }
+    
+
+  
+    
+    function TamilParser() {            
+        this.ayutham = ['ஃ'];      
+        this.uyir = 'அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ'.split(/\s+/);
+        this.uyir_kuril_nedil = 'k n k n k n k n n k n n'.split(/\s+/);
+        let mei_a = "க ங ச ஞ ட ண த ந ப ம ய ர ல வ ழ ள ற ன ஜ ஶ ஸ ஷ ஹ க்ஷ".split(/\s+/);
+        this.mei = mei_a.map(i=>(i+ ("க்".slice(1, 2))));
+            
+        this.compound_vowels = [""].concat(
+            "கா கி கீ கு கூ கெ கே கை கொ கோ கௌ".split(/\s+/ ).map(i=>i.slice(1, i.length)));         
+        this.uyirmei = [];
+        for(let i of mei_a  ) {
+            for(let j of this.compound_vowels){
+                this.uyirmei.push(i+j);   
+            }
+        }
+ 
+        this.uyirmei_kuril_nedil = []
+        for(let i of this.mei) {
+            for(let j =0; j<this.compound_vowels.length;j++){
+                this.uyirmei_kuril_nedil.push(this.uyir_kuril_nedil[j]);
+            }
+        }                            
+        this.special_symbols = 'ஶ்ரீ ௐ'.split(/\s+/);
+        this.all_symbols_map =  new Map([
+             ["ayutham", this.ayutham], ["uyir", this.uyir], ["mei", this.mei],     
+             ["uyirmei", this.uyirmei], ["special", this.special_symbols]]);                
+        this.all_symbols = [].concat(this.ayutham,this.uyir,this.mei,this.uyirmei,this.special_symbols);
+        this.all_symbols_kuril_nedil_otru = ['o'].concat(this.uyir_kuril_nedil,
+            ntimes("o", this.mei.length), 
+            this.uyirmei_kuril_nedil, ntimes('s', this.special_symbols.length));      
+        this.all_symbols_type_map = new Map();
+        for(let k of this.all_symbols_map.keys()) {
+            for(let v of this.all_symbols_map.get(k)) {
+                this.all_symbols_type_map.set(v, k);  
+            }
+        }                        
+        this.all_symbols_index_map = new Map();
+        for(i=0;i<this.all_symbols.length;i++){
+            this.all_symbols_index_map.set(this.all_symbols[i], i);       
+        }
+        
+        this.endswith_u = function (s) {
+            let s0 = mapget(this.all_symbols_index_map, s, s);
+            let s1 = s0 - (1+this.uyir.length+this.mei.length);
+            return ((s1%this.compound_vowels.length) == 4 )
+        }        
+        
+        this.get_type = function (s) {
+            let s0 = ((typeof s) == (typeof 1))? this.all_symbols[s] :s; 
+            let result = mapget(this.all_symbols_type_map, s0, 'others');
+            return result;
+        }
+        
+        this.get_mei_inam = function (s) {           
+            let typ = "v m v m v m v m v m i i i i i i v m o o o o o o".split(/\s+/)
+            let s0 = ((typeof s) == (typeof 1))? this.all_symbols[s] :s;
+            let t = mapget(this.all_symbols_type_map, s0, 'others');
+            if ((t == "mei") || (t == "uyirmei")){
+                let s1 = mapget(this.all_symbols_index_map, s, s);         
+                let s2 = s1 - (1+this.uyir.length);
+                let s3 = Math.floor(s2 / this.compound_vowels.length);
+                return typ[s3];
+            } else {
+                return "o"; 
+            }
+        }
+               
+                                
+        this.ezhuthu_type = function (ch) {           
+            let ty = this.get_type(ch);
+            let nedil_kuril = this.all_symbols_kuril_nedil_otru[ch];
+            let inam = this.get_mei_inam(ch);          
+            return [ty, nedil_kuril, inam];                 
+        }
+        
+
+        
+                                      
+        this.get_char = function (i) {
+            if (i < 0) {
+                return String.fromCharCode(-i);
+            } else {
+                return this.all_symbols.get(i);
+            }
+        }
+        
+        this.print_text = function (tamil_num_text) {
+            return tamil_num_text.map( x => get_char(i)).join('');
+        }
+ 
+        this.parse_text = function(data){
+            return transliterate_text(this.all_symbols_index_map, data);
+        }
+                     
+    }
+    
+    const nernirai_maps = {
+        map_ner_nirai: new Map(
+             [["NER", "e"], 
+              ["NIRAI","i"], 
+              ["others","o"]]),
+        map_asai: new Map(
+             [["e", "naal"],
+              ["i", "malar"],
+              ["ee", "thema"],
+              ["ie", "pulima"],
+              ["ei", "kuvilam"],
+                ["ii", "karuvilam"],
+                ["eee", "themankai"],
+                ["iee", "pulimankai"],
+                ["eie", "kuvilankai"],
+                ["iie", "karuvilankai"],
+                ["eei", "themankani"],
+                ["iei", "pulimankani"],
+                ["eii", "kuvilankani"],
+                ["iii", "karuvilankani"],
+                ["eeee", "themanthanpoo"],
+                ["ieee", "pulimanthanpoo"],
+                ["eiee", "kuvilanthanpoo"],
+                ["iiee", "karuvilanthanpoo"],
+                ["eeie", "themanarumpoo"],
+                ["ieie", "pulimanarumpoo"],
+                ["eiie", "kuvilanarumpoo"],
+                ["iiie", "karuvilanarumpoo"],
+                ["eeei", "themanthannizhal"],
+                ["ieei", "pulimanthannizhal"],
+                ["eiei", "kuvilanthannizhal"],
+                ["iiei", "karuvilanthannizhal"],
+                ["eeii", "themanarunizhal"],
+                ["ieii", "pulimanarunizhal"],
+                ["eiii", "kuvilanarunizhal"],
+                ["iiii", "karuvilanarunizhal"]]
+                ),
+        map_thalai : new Map([["thema", [
+          "malar", "pirappu", "pulima", "karuvilam", "pulimankai", "karuvilankai"]],
+          ["pulima", ["malar", "pirappu", "pulima", "karuvilam", "pulimankai", "karuvilankai"]],
+          ["kuvilam", ["naal", "kaasu", "thema", "kuvilam", "themankai", "kuvilankai"]],               
+          ["karuvilam" ,["naal", "kaasu", "thema", "kuvilam", "themankai", "kuvilankai"]], 
+          ["themankai" ,["naal", "kaasu", "thema", "kuvilam", "themankai", "kuvilankai"]], 
+          ["pulimankai" ,["naal", "kaasu", "thema", "kuvilam", "themankai", "kuvilankai"]], 
+          ["kuvilankai" ,["naal", "kaasu", "thema", "kuvilam", "themankai", "kuvilankai"]], 
+          ["karuvilankai" ,["naal", "kaasu", "thema", "kuvilam", "themankai", "kuvilankai"]]]),                   
+    
+        map_reverse_asai : new Map()
+    }
+    for(let k of nernirai_maps.map_asai.keys()){
+        nernirai_maps.map_reverse_asai.set(nernirai_maps.map_asai.get(k), k);
+    }
+    nernirai_maps.map_reverse_asai.set('kasu', 'ee');
+    nernirai_maps.map_reverse_asai.set('pirappu', 'ie');     
+    
+       
+    function NerNiraiParser(){
+        this.ner = 'koo noo ko no k n o'.split(/\s+/);
+        this.nirai = 'kkoo knoo kko kno kk kn'.split(/\s+/);
+        this.ner_nirai_map = new Map([['NER',this.ner], ['NIRAI',this.nirai]]);
+        this.ner_nirai_symbols = [].concat(this.ner, this.nirai);
+        this.ner_nirai_symbols_type = new Map();
+        for(let k of this.ner_nirai_map.keys()){ 
+            for(let v of this.ner_nirai_map.get(k)){
+                this.ner_nirai_symbols_type.set(v, k);
+            }
+        }
+ 
+        this.ner_nirai_index_map = new Map();
+        for(let i=0;i<this.ner_nirai_symbols.length;i++){ 
+            this.ner_nirai_index_map.set(this.ner_nirai_symbols[i], i);
+        } 
+ 
+        this.parse_text = function(data){
+            return transliterate_text(this.ner_nirai_index_map, data);
+        }
+             
+    }      
+
+     
+    function Seer(data) {
+        this.asai_maps = nernirai_maps;
+        this.map_ner_nirai = this.asai_maps.map_ner_nirai;
+        this.thalai_map = this.asai_maps.map_thalai;
+        this.asai_map = this.asai_maps.map_asai;
+        this.map_reverse_asai = this.asai_maps.map_reverse_asai;
+        this.tamil_unicode_parser = new TamilParser();
+        this.ner_nirai_parser = new NerNiraiParser();
+        this.result_venba_edugai = false;
+        
+         
+        this.check_thalai = function( nindra, vanda){ 
+            let res = [];
+            if (this.thalai_map.has(vanda)) {
+                res = thalai_map.get(nindra);
+            }
+            return res;
+        }     
+    
+        this.get_parsed_text = function(parsed_text, tamil_num_text){
+            let t = [];
+            let p = 0;
+            for(let i of parsed_text){
+                let l = i.length;
+                t.push(tamil_num_text.slice(p,p+l).map(
+                        j => this.tamil_unicode_parser.all_symbols[j] ).join(''));
+                p += l;
+            }
+            return t.join('|');
+        }
+                    
+                                             
+        this.parse_text = function(tamil_text){
+            let tamil_num_text = this.tamil_unicode_parser.parse_text(tamil_text);
+            let kno_text = tamil_num_text.map(i => this.tamil_unicode_parser.all_symbols_kuril_nedil_otru[
+                i]).join('');
+            let ner_nirai_parsed_text = this.ner_nirai_parser.parse_text(kno_text);
+            let parsed_text = ner_nirai_parsed_text.map(t => this.ner_nirai_parser.ner_nirai_symbols[t]); 
+            let parsed_tamil_text = this.get_parsed_text(parsed_text, tamil_num_text);    
+            let ner_nirai_mapped_text = parsed_text.map(t =>
+                 this.ner_nirai_parser.ner_nirai_symbols_type.get(t)).join('|'); 
+            let s = parsed_text.map(t => this.map_ner_nirai.get(
+                this.ner_nirai_parser.ner_nirai_symbols_type.get(t))).join('');
+            let asai = mapget(this.asai_map, s, 'others')            
+            return [tamil_num_text, parsed_tamil_text, ner_nirai_mapped_text, asai];
+        }
+
+        this.check_venba_eetru_asai = function(){
+            let last_adi = this.adi_seer.length -1;
+            let last_seer = this.adi_seer[last_adi].length-1;
+            let num_text = this.adi_seer_items.get(pairO(last_adi, last_seer))[0];
+            let asai = this.adi_seer_items.get(pairO(last_adi, last_seer))[3]; 
+            this.last_asai = asai;
+            if ((asai == 'naal') || (asai == 'malar')) {
+                result =  [asai, true];
+            } else if  (this.tamil_unicode_parser.endswith_u(num_text[num_text.length-1])) {
+                if (asai == 'thema'){
+                    result = ['kaasu', true];
+                } else if  (asai == 'pulima'){
+                    result =  ['pirappu', true];
+                } else {
+                    result =  [asai, false];
+                }
+            } else {
+                result = [asai, false];
+            }
+            this.eetru_asai = result[0];
+            this.eetru_seer_result = result[1];
+            u = this.adi_seer_items.get(pairO(last_adi, last_seer))[0];
+            p = this.adi_seer_items.get(pairO(last_adi, last_seer))[1];
+            n = this.adi_seer_items.get(pairO(last_adi, last_seer))[2];
+            a = this.adi_seer_items.get(pairO(last_adi, last_seer))[3];                      
+            this.adi_seer_items.set(pairO(last_adi, last_seer), [u, p, n, this.eetru_asai]);
+        }  
+              
+        this.restore_venba_eetru_asai = function( ){
+            let last_adi = this.adi_seer.length -1;
+            let last_seer = this.adi_seer[last_adi].length -1;
+            let asai = this.adi_seer_items.get(pairO(last_adi, last_seer))[3];
+            if ((asai == 'kaasu') || (asai == 'pirappu')) {
+                u = this.adi_seer_items.get(pairO(last_adi, last_seer))[0];
+                p = this.adi_seer_items.get(pairO(last_adi, last_seer))[1];
+                n = this.adi_seer_items.get(pairO(last_adi, last_seer))[2];
+                a = this.adi_seer_items.get(pairO(last_adi, last_seer))[3];                                    
+                this.adi_seer_items.set(pairO(last_adi, last_seer), [u, p, n, this.last_asai]) ; 
+            }
+        }
+                         
+        this.preprocess = function(data){
+            let d = data.replace('-', ' ');
+            d = d.replace(/\(.*\)/gm, '');
+            return d;
+        }
+                       
+        this.get_thalai = function(asai1, asai2){          
+            let rasai1 = this.map_reverse_asai.get(asai1); 
+            let rasai2 = this.map_reverse_asai.get(asai2);   
+            if (rasai1.length == 2){
+                if (rasai1[rasai1.length-1] == rasai2[0]) {
+                    if (rasai1[rasai1.length-1] == 'e'){
+                        return 'nerondrasiriyathalai';
+                    } else {
+                        return 'niraiondrasiriyathalai';
+                    }
+                } else {
+                    return 'iyarcheervendalai';
+                }
+            } else if  (rasai1.length == 3) {
+                if (rasai1[rasai1.length-1] == 'e') {
+                    if (rasai2[0] == 'e') {
+                        return 'venseervendalai';
+                    } else {
+                        return 'kalithalai';
+                    }
+                } else {
+                    if (rasai1[-1] == 'e'){
+                        return 'ondriyavanjithalai';                    
+                    } else {
+                        return 'ondrathavanjithalai';
+                    }
+                 }
+            } else {
+                return 'others';
+            }
+        }
+                                                    
+        this.count_adi_ezhuthukkal = function(){
+            this.adi_ezhuthukkal_count = ntimes(0, this.adi_seer.length);
+            let num_text = '';                                                                                        
+        }
+                                
+        this.adi_seer_process = function(data){
+            this.data = data;
+            this.data_preprocessed = strip(this.preprocess(data));
+            this.adi_seer = this.data_preprocessed.split('\n').map(i=>i.split(/\s+/));
+            this.adi_seer_items = new Map();
+            for(i=0;i<this.adi_seer.length;i++){
+                for(j=0;j<this.adi_seer[i].length;j++){
+                    this.adi_seer_items.set(pairO(i,j), this.parse_text(this.adi_seer[i][j]));
+                }
+            }
+ 
+            this.adi_seer_thalai = new Map();
+            for(i=0;i<this.adi_seer.length;i++){
+                for(j=0;j<this.adi_seer[i].length;j++){
+                    let adi = this.adi_seer[i];            
+                    if ((i == this.adi_seer.length-1)&&( j == adi.length-1)){                       
+                        this.adi_seer_thalai.set(pairO(i,j), 'last_thalai');
+                    } else {                        
+                        next_asai = (j < adi.length-1)?pairO(i,j+1):pairO(i+1, 0);
+                        this.adi_seer_thalai.set(pairO(i,j), this.get_thalai(this.adi_seer_items.get(pairO(i,j))[3],
+                                    this.adi_seer_items.get(next_asai)[3]));
+                    }
+                }
+            }
+            this.count_adi_ezhuthukkal();       
+        }
+                                        
+        this.adi_seer_text = function(){  
+            let nernirai_split_text_list = [];
+            let nernirai_labels_list = [];
+            let asai_text_list = []; 
+            let thalai_check_text_list = []; 
+            for(i=0;i<this.adi_seer.length;i++){ 
+                let t = [];
+                for(k=0;k<this.adi_seer[i].length;k++){ 
+                    t.push(this.adi_seer_items.get(pairO(i,k))[1]);  
+                }
+                nernirai_split_text_list.push(t.join(' '));
+                t = [];
+                for(k=0;k<this.adi_seer[i].length;k++){ 
+                    t.push(this.adi_seer_items.get(pairO(i,k))[2]);  
+                }
+                nernirai_labels_list.push(t.join(' '));
+                t = [];
+                for(k=0;k<this.adi_seer[i].length;k++){ 
+                    t.push(this.adi_seer_items.get(pairO(i,k))[3]);  
+                }
+                asai_text_list.push(t.join(' '));            
+                t = [];
+                for(k=0;k<this.adi_seer[i].length;k++){ 
+                    t.push(this.adi_seer_thalai.get(pairO(i,k)));  
+                }
+                thalai_check_text_list.push(t.join(' '));                
+            }           
+            this.nernirai_split_text = nernirai_split_text_list.join('\n');
+            this.nernirai_labels = nernirai_labels_list.join('\n');
+            this.asai_text = asai_text_list.join('\n');
+            this.thalai_check_text =  thalai_check_text_list.join('\n'); 
+        }
+        
+        this.check_nerisai_venba_edugai = function(){
+            first_seer_letters = []; 
+            for(let i=0;i<this.adi_seer.length;i++){            
+                first_seer_letters.push([this.tamil_unicode_parser.ezhuthu_type(
+                       this.adi_seer_items.get(pairO(i, 0))[0][0])[1],
+                       this.adi_seer_items.get(pairO(i, 0))[0][1]] );
+                if (i==1){
+                    first_seer_letters.push([this.tamil_unicode_parser.ezhuthu_type(
+                        this.adi_seer_items.get(pairO(i, 3))[0][0])[1],
+                           this.adi_seer_items.get(pairO(i, 3))[0][1] ]);           
+                }
+            } 
+            nk =  first_seer_letters[0][0];             
+            ch =  first_seer_letters[0][1];
+            let result = true;
+            for(let s=1;s<3;s++){ 
+                i = first_seer_letters[s][0];
+                j = first_seer_letters[s][1];                   
+                if (!((nk == i) && (ch == j))){                
+                    result = false;
+                    break;
+                }
+            }                          
+            nk =  first_seer_letters[3][0];
+            ch =  first_seer_letters[3][1];        
+            result = ((result) && (nk ==  first_seer_letters[4][0]) && 
+                  (ch == first_seer_letters[4][1]));
+            this.result_venba_edugai = result;
+            return result;
+        }
+        
+        this.check_venba_edugai = function(){
+            first_seer_letters = [];
+            for(i=0;i<this.adi_seer.length;i++){ 
+                first_seer_letters.push([this.tamil_unicode_parser.ezhuthu_type(
+                            this.adi_seer_items.get(pairO(i, 0))[0][0])[1],
+                       this.adi_seer_items.get(pairO(i, 0))[0][1]] );
+            }            
+            nk =  first_seer_letters[0][0];
+            ch =  first_seer_letters[0][1];
+            result = ( (nk ==  first_seer_letters[1][0]) && 
+                      (ch == first_seer_letters[1][1]));   
+            if (first_seer_letters.length == 4){
+                nk =  first_seer_letters[2][0];
+                ch =  first_seer_letters[2][1];   
+                result = ((result) && (nk ==  first_seer_letters[3][0]) && 
+                      (ch == first_seer_letters[3][1]));                  
+            }               
+            this.result_venba_edugai = result;
+            return result;
+        }
+                
+        this.check_venba_thalai = function(){
+            let res = true;
+            let t = Array.from(this.adi_seer_thalai.values());
+            for(let i=0; i<t.length; i++){     
+                if (!((t[i] == 'venseervendalai')||(t[i] == 'iyarcheervendalai')||(t[i] == 'last_thalai'))) {
+                    res = false;
+                    break;
+                }     
+            }
+            this.result_venba_thalai = res; 
+            return this.result_venba_thalai;
+        }
+                                                                                                                                                          
+        this.check_venba = function(){
+            let adi_length = this.adi_seer.length;
+            let error_text = "";
+            if (adi_length  > 1){
+                let res = true;
+                for(let i=0; i<this.adi_seer.length-1; i++){
+                    if (this.adi_seer[i].length != 4){
+                        res = false;
+                        error_text = `Error: seer length of adi ${i} not equal to 4`;
+                        break
+                    }
+                }
+                if (res) {
+                    if (this.adi_seer[this.adi_seer.length-1].length == 3){
+                        this.check_venba_eetru_asai() ;
+                        this.adi_seer_text();
+                        this.restore_venba_eetru_asai();
+                        r1 = this.check_venba_thalai();
+                        result = (this.check_venba_thalai() && this.eetru_seer_result);                        
+                        if (adi_length == 2){
+                            if ((this.check_venba_edugai())&&(result)){
+                                    return 'kural_venba';
+                            } else {
+                                    return 'others';
+                            }
+                        } else if ((adi_length == 3)) {
+                            if(result){
+                                return 'sindiyal_venba';
+                            } else {
+                                return 'others';
+                            }
+                        } else if (adi_length == 4) {
+                            if ((this.check_nerisai_venba_edugai())&& (result)){
+                                    return 'nerisai_venba';
+                            } else if (this.check_venba_edugai()){
+                                if (result){
+                                    return 'innisai_venba';
+                                }
+                                return 'others';
+                            }
+                            return 'others';
+                        } else if (adi_length < 13) {
+                            if (result){
+                                return 'patrodai_venba';
+                            }
+                            return 'others';
+                        } else {
+                            if (result) {
+                                return 'kali_venba';
+                            }  
+                            return 'others';
+                        }
+                    }
+                    return "length of last adi not equal to 3";
+                }
+                return error_text;
+            }                             
+            return 'Error: adi length <= 1';
+        }
+    }
+ 
+   
+    function print_venba_text(data){
+        seer_parse = new Seer();  
+        seer_parse.adi_seer_process(data);
+        result = seer_parse.check_venba();
+        let p = `
+        venba grammar ${result}
+        edugai ${seer_parse.result_venba_edugai}
+        ${seer_parse.nernirai_split_text}
+        ${seer_parse.nernirai_labels} 
+        ${seer_parse.asai_text}
+        ${seer_parse.thalai_check_text}            
+         `;  
+        return(newline2br(p));
+                           
+    }
+    
+    function check_venba_text_box() {
+        let source = $('#SOURCE').val();
+        let target = print_venba_text(source);
+        $('#TARGET').html(target);
+    }    
+        
+    function check_venba_init() {
+        let input = document.getElementById('SOURCE');
+        input.addEventListener("keyup", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                check_venba_text_box();
+            }
+        });
+    }    
+    
+    </script> 
+   <script type="text/javascript">
+        check_venba_init()
+    </script>       
+    
+    </body>
+    
+</html>
