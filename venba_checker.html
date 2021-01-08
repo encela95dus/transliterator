@@ -10,25 +10,41 @@
 <body>
 
   <div class="container">
-    <center><h1>Venba Check</h1></center>
+    <center><h1>வெண்பா இலக்கணம் சரிபார்க்க</h1></center>
     <div class="row">
         <div class="col-sm">
-            <button type="button" class="btn btn-primary" onclick="check_venba_text_box()">Check Venba</button>
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                முன்பதிவிட்ட பாட்டுகளில் ஒன்றை தேர்ந்தெடுக
+              </button>
+              <div class="dropdown-menu" id="poemName" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">பாட்டு1</a>
+                <a class="dropdown-item" href="#">பாட்டு2</a>
+                <a class="dropdown-item" href="#">பாட்டு3</a>
+              </div>
+            </div>
         </div>
         <div class="col-sm">
-            <em>Venba Input</em>
+            <button type="button" class="btn btn-primary" onclick="check_venba_text_box()">சரிபார்க்க</button>
+        </div>
+        <div class="col-sm">
+            <em></em>
         </div>
     </div>
     <div class="row">
         <div class="col-sm">
-            <textarea id="SOURCE" rows="25" cols="40">
+            <textarea id="SOURCE" rows="15" cols="80">
 அகர முதல எழுத்தெல்லாம் ஆதி    
 பகவன்  முதற்றே உலகு                     
             </textarea>
-        </div>
-        <div class="col-sm" style="border-style: solid; border-width:thin; border-color: #0;" id="TARGET">
-        </div>
+        </div>  
     </div>
+    <div class="row"> 
+        <div class="col-sm">
+            <textarea id="TARGET" rows="15" cols="80">          
+            </textarea>
+        </div>    
+    </div>       
   </div>
 
 
@@ -240,7 +256,7 @@
                 ["eei", "themankani"],
                 ["iei", "pulimankani"],
                 ["eii", "kuvilankani"],
-                ["iii", "karuvilankani"],
+                ["iii", "karuvilankani"],    
                 ["eeee", "themanthanpoo"],
                 ["ieee", "pulimanthanpoo"],
                 ["eiee", "kuvilanthanpoo"],
@@ -275,8 +291,64 @@
     }
     nernirai_maps.map_reverse_asai.set('kasu', 'ee');
     nernirai_maps.map_reverse_asai.set('pirappu', 'ie');     
-    
-       
+
+    let tamil_maps =  new Map(
+               [["NER", "நேர்"], 
+                ["NIRAI","நிரை"], 
+                ["others","மற்றவை"],
+                ["naal", "நாள்"],
+                ["malar", "மலர்"],
+                ["thema", "தேமா"],
+                ["pulima", "புளிமா"],
+                ["kuvilam", "கூவிளம்"],
+                ["karuvilam", "கருவிளம்"],
+                ["themankai", "தேமாங்காய்"],
+                ["pulimankai", "புளிமாங்காய்"],
+                ["kuvilankai", "கூவிளங்காய்"],
+                ["karuvilankai", "கருவிளங்காய்"],
+                ["themankani", "தேமாங்கனி"],
+                ["pulimankani", "புளிமாங்கனி"],
+                ["kuvilankani", "கூவிளங்கனி"],
+                ["karuvilankani", "கருவிளங்கனி"],    
+                ["themanthanpoo", 'தேமாந்தண்பூ'],
+                ["pulimanthanpoo", 'புளிமாந்தண்பூ'],
+                [ "kuvilanthanpoo", 'கூவிளந்தண்பூ'],
+                [ "karuvilanthanpoo", 'கருவிளந்தண்பூ'],
+                [ "themanarumpoo", 'தேமாநறும்பூ'],
+                [ "pulimanarumpoo", 'புனிமாநறும்பூ'],
+                [ "kuvilanarumpoo", 'கூவிளநறும்பூ'],
+                [ "karuvilanarumpoo", 'கருவிளநறும்பூ'],
+                [ "themanthannizhal", 'தேமாந்தண்ணிழல்'],
+                [ "pulimanthannizhal", 'புளிமாந்தண்ணிழல்'],
+                [ "kuvilanthannizhal", 'கூவிளந்தண்ணிழல்'],
+                [ "karuvilanthannizhal", 'கருவிளந்தண்ணிழல்'],
+                [ "themanarunizhal", 'தேமாநறுநிழல்'],
+                [ "pulimanarunizhal", 'புளிமாநறுநிழல்'],
+                [ "kuvilanarunizhal", 'கூவிளநறுநிழல்'],
+                [ "karuvilanarunizhal", 'கருவிளநறுநிழல்'],
+                ["kaasu", "காசு"],
+                ["pirappu", "பிறப்பு"],                  
+                ["nerondrasiriyathalai", "நேரொன்றாசிரியதளை"],                                                   
+                ["niraiondrasiriyathalai", "நிரையொன்றாசிரியதளை"],                                                                                    
+                ["iyarcheervendalai", "இயற்சீர்வெண்டளை"],
+                ["venseervendalai", "வெண்சீர்வெண்டளை"],                  
+                ["kalithalai", "கலித்தளை"],                                                   
+                ["ondriyavanjithalai", "ஒன்றியவஞ்சித்தளை"],
+                ["ondrathavanjithalai", "ஒன்றாதவஞ்சித்தளை"],
+                ["last_thalai", "கடைசிதளை"],
+                ["kural_venba", "குறள் வெண்பா"], 
+                ["sindiyal_venba", "சிந்தியல் வெண்பா"], 
+                ["nerisai_venba", "நேரிசை வெண்பா"], 
+                ["innisai_venba", "இன்னிசை வெண்பா"], 
+                ["patrodai_venba", "பஃறொடை வெண்பா"], 
+                ["kali_venba", "கலி வெண்பா"],
+                ["true", "சரி"],
+                ["false", "தவறு"]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+          ]);        
+
+                
+                                          
+                                                                                    
     function NerNiraiParser(){
         this.ner = 'koo noo ko no k n o'.split(/\s+/);
         this.nirai = 'kkoo knoo kko kno kk kn'.split(/\s+/);
@@ -309,7 +381,7 @@
         this.map_reverse_asai = this.asai_maps.map_reverse_asai;
         this.tamil_unicode_parser = new TamilParser();
         this.ner_nirai_parser = new NerNiraiParser();
-        this.result_venba_edugai = false;
+        this.result_venba_edugai = true;
         
          
         this.check_thalai = function( nindra, vanda){ 
@@ -337,15 +409,17 @@
             let tamil_num_text = this.tamil_unicode_parser.parse_text(tamil_text);
             let kno_text = tamil_num_text.map(i => this.tamil_unicode_parser.all_symbols_kuril_nedil_otru[
                 i]).join('');
-            let ner_nirai_parsed_text = this.ner_nirai_parser.parse_text(kno_text);
-            let parsed_text = ner_nirai_parsed_text.map(t => this.ner_nirai_parser.ner_nirai_symbols[t]); 
-            let parsed_tamil_text = this.get_parsed_text(parsed_text, tamil_num_text);    
-            let ner_nirai_mapped_text = parsed_text.map(t =>
-                 this.ner_nirai_parser.ner_nirai_symbols_type.get(t)).join('|'); 
-            let s = parsed_text.map(t => this.map_ner_nirai.get(
+            let kno_parsed_text = this.ner_nirai_parser.parse_text(kno_text);
+            let ner_nirai_parsed_text = kno_parsed_text.map(t =>
+                             this.ner_nirai_parser.ner_nirai_symbols[t]); 
+            let parsed_tamil_text = this.get_parsed_text(ner_nirai_parsed_text, tamil_num_text);    
+            let ner_nirai_mapped_text = ner_nirai_parsed_text.map(t =>
+                 this.ner_nirai_parser.ner_nirai_symbols_type.get(t)).map(x=>tamil_maps.get(x)).join('|'); 
+            let s = ner_nirai_parsed_text.map(t => this.map_ner_nirai.get(
                 this.ner_nirai_parser.ner_nirai_symbols_type.get(t))).join('');
             let asai = mapget(this.asai_map, s, 'others')            
-            return [tamil_num_text, parsed_tamil_text, ner_nirai_mapped_text, asai];
+            return [tamil_num_text, parsed_tamil_text, ner_nirai_mapped_text, asai, 
+                kno_parsed_text.map(t=>this.ner_nirai_parser.ner_nirai_symbols[t]).join('|')];
         }
 
         this.check_venba_eetru_asai = function(){
@@ -372,8 +446,9 @@
             u = this.adi_seer_items.get(pairO(last_adi, last_seer))[0];
             p = this.adi_seer_items.get(pairO(last_adi, last_seer))[1];
             n = this.adi_seer_items.get(pairO(last_adi, last_seer))[2];
-            a = this.adi_seer_items.get(pairO(last_adi, last_seer))[3];                      
-            this.adi_seer_items.set(pairO(last_adi, last_seer), [u, p, n, this.eetru_asai]);
+            a = this.adi_seer_items.get(pairO(last_adi, last_seer))[3];  
+            x = this.adi_seer_items.get(pairO(last_adi, last_seer))[4];                                                                                                                       
+            this.adi_seer_items.set(pairO(last_adi, last_seer), [u, p, n, this.eetru_asai, x]);
         }  
               
         this.restore_venba_eetru_asai = function( ){
@@ -384,14 +459,15 @@
                 u = this.adi_seer_items.get(pairO(last_adi, last_seer))[0];
                 p = this.adi_seer_items.get(pairO(last_adi, last_seer))[1];
                 n = this.adi_seer_items.get(pairO(last_adi, last_seer))[2];
-                a = this.adi_seer_items.get(pairO(last_adi, last_seer))[3];                                    
-                this.adi_seer_items.set(pairO(last_adi, last_seer), [u, p, n, this.last_asai]) ; 
+                a = this.adi_seer_items.get(pairO(last_adi, last_seer))[3]; 
+                x = this.adi_seer_items.get(pairO(last_adi, last_seer))[4];                                                                                       
+                this.adi_seer_items.set(pairO(last_adi, last_seer), [u, p, n, this.last_asai, x]) ; 
             }
         }
                          
         this.preprocess = function(data){
             let d = data.replace('-', ' ');
-            d = d.replace(/\(.*\)/gm, '');
+            //d = d.replace(/\(.*\))/gm, '');
             return d;
         }
                        
@@ -464,6 +540,7 @@
             let nernirai_labels_list = [];
             let asai_text_list = []; 
             let thalai_check_text_list = []; 
+            let kno_text_list = [];
             for(i=0;i<this.adi_seer.length;i++){ 
                 let t = [];
                 for(k=0;k<this.adi_seer[i].length;k++){ 
@@ -484,12 +561,26 @@
                 for(k=0;k<this.adi_seer[i].length;k++){ 
                     t.push(this.adi_seer_thalai.get(pairO(i,k)));  
                 }
-                thalai_check_text_list.push(t.join(' '));                
+                thalai_check_text_list.push(t.join(' ')); 
+                t = [];
+                for(k=0;k<this.adi_seer[i].length;k++){ 
+                    t.push(this.adi_seer_items.get(pairO(i,k))[4]);  
+                }  
+                kno_text_list.push(t.join(' '));                                             
             }           
             this.nernirai_split_text = nernirai_split_text_list.join('\n');
             this.nernirai_labels = nernirai_labels_list.join('\n');
-            this.asai_text = asai_text_list.join('\n');
-            this.thalai_check_text =  thalai_check_text_list.join('\n'); 
+            let aa = [];
+            for (x of asai_text_list) {
+                aa.push(x.split(/\s+/).map(x=>mapget(tamil_maps, x, x)).join(' '));
+            }
+            this.asai_text = aa.join('\n');
+            let bb = [];
+            for (x of thalai_check_text_list) {
+                bb.push(x.split(/\s+/).map(x=>mapget(tamil_maps, x, x)).join(' '));
+            }
+            this.thalai_check_text = bb.join('\n');  
+            this.kno_text = kno_text_list.join('\n');                     
         }
         
         this.check_nerisai_venba_edugai = function(){
@@ -559,13 +650,11 @@
                                                                                                                                                           
         this.check_venba = function(){
             let adi_length = this.adi_seer.length;
-            let error_text = "";
             if (adi_length  > 1){
                 let res = true;
                 for(let i=0; i<this.adi_seer.length-1; i++){
                     if (this.adi_seer[i].length != 4){
                         res = false;
-                        error_text = `Error: seer length of adi ${i} not equal to 4`;
                         break
                     }
                 }
@@ -610,36 +699,52 @@
                             return 'others';
                         }
                     }
-                    return "length of last adi not equal to 3";
                 }
-                return error_text;
             }                             
-            return 'Error: adi length <= 1';
+            return 'others';
         }
+  
     }
  
    
     function print_venba_text(data){
-        seer_parse = new Seer();  
+        let seer_parse = new Seer();  
         seer_parse.adi_seer_process(data);
-        result = seer_parse.check_venba();
+        let result = seer_parse.check_venba();
+        let result_tamil = mapget(tamil_maps, result, result);
+        let edugai_result = String(seer_parse.result_venba_edugai);
+        let edugai_result_tamil = mapget(tamil_maps, edugai_result, edugai_result);
+        let kno_text_tamil = seer_parse.kno_text.replace(
+            /k/g, 'கு').replace(/n/g, 'நெ').replace(/o/g, 'ஒ');
         let p = `
-        venba grammar ${result}
-        edugai ${seer_parse.result_venba_edugai}
-        ${seer_parse.nernirai_split_text}
-        ${seer_parse.nernirai_labels} 
-        ${seer_parse.asai_text}
-        ${seer_parse.thalai_check_text}            
+வெண்பா வகை  ${result_tamil}
+
+ எதுகை ${edugai_result_tamil}
+
+${seer_parse.nernirai_split_text}
+
+${kno_text_tamil}
+
+${seer_parse.nernirai_labels} 
+
+${seer_parse.asai_text}
+
+${seer_parse.thalai_check_text}                    
          `;  
-        return(newline2br(p));
-                           
+        return(p);                           
     }
     
     function check_venba_text_box() {
         let source = $('#SOURCE').val();
+        $('#TARGET').html(" ");
         let target = print_venba_text(source);
         $('#TARGET').html(target);
     }    
+    function check_venba_drop_box() {
+        let source = $('#SOURCE').val();
+        $('#TARGET').html(" ");
+    }        
+    
         
     function check_venba_init() {
         let input = document.getElementById('SOURCE');
@@ -649,7 +754,38 @@
                 check_venba_text_box();
             }
         });
-    }    
+    } 
+    
+     var data1 = `
+    சாதி இரண்டொழிய வேறில்லை சாற்றுங்கால்
+    நீதி வழுவா நெறிமுறையின் - மேதினியில்
+    இட்டார் பெரியார் இடாதார் இழிகுலத்தார்
+    பட்டாங்கில் உள்ள படி
+    
+    `;
+        
+    var data2 = `
+    இன்னுயிர் போயின் திரும்பி வராதெனினும்
+    தன்னுயிர்த் தந்தேனும் காத்திட்டார் - தன்னலம்
+    பாராது யிர்நீத்த பண்பாளர் எந்நாளும்
+    தீராப் புகழ்தான வர்க்கு
+    `;
+            
+    
+      
+    var data3 = `
+    உடுக்கை இழந்தவன் கைபோல ஆங்கே
+    இடுக்கண் களைவதாம் நட்பு
+    ` ;          
+    
+    var poems = new Map([["பாட்டு1", data1], ["பாட்டு2", data2], ["பாட்டு3", data3]]); 
+    
+     $("#poemName a").on("click", function(){
+ 
+      var x = $(this).text(); 
+      //console.log(x);
+      $('#SOURCE').html(poems.get(x));
+    });   
     
     </script> 
    <script type="text/javascript">
