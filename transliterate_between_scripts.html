@@ -4,110 +4,356 @@
 <head>
 <meta charset="utf-8">
 <link media="all" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" type="text/css" />
-<title>Indic Transliterator</title>
+<title>Transliterate beween Formats</title>
+
+<style type="text/css">
+:root {
+    --black-100: #d6d9dc;
+    --black-300: #9fa6ad;
+}
+
+table {
+    border: none;
+}
+
+td.keycol {
+    background-clip: padding-box;
+    border-radius: 5px;
+    border: 5px solid white;
+    cursor: pointer;
+    background-color: var(--black-100)
+}
+
+td.keycol:hover {
+    background-color:var(--black-300)
+}
+
+</style>
+
 </head>
 
 <body>
+    <header class="navbar navbar-expand sticky-top navbar-light bg-light nav-fill">
+        <ul class="navbar-nav col-12">
+          <li class="nav-item">
+               &nbsp; Input: &nbsp;
+          </li>
+          <li class="nav-item">
+            <select class="form-control" id="SCRIPT_INPUT" onchange="set_input_script(this)">
+            </select>
+          </li>
+          <li class="nav-item">
+              &nbsp; Output: &nbsp; 
+          </li>
+          <li class="nav-item">
+            <select class="form-control" id="SCRIPT_OUTPUT" onchange="set_output_script(this)">
+            </select>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-primary" onclick="transliterate_button()">Transliterate</button>
+          </li>
+        </ul>
+    </header>
 
-  <div class="container">
-    <center><h1>Transliterate</h1></center>
-    <div class="row">
-        <div class="col-sm">
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                input script
-              </button>
-              <div class="dropdown-menu" id="scriptInputName" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">sanskrit</a>
-                <a class="dropdown-item" href="#">sanskrit_extended</a>                                
-                <a class="dropdown-item" href="#">telugu</a>
-                <a class="dropdown-item" href="#">tamil</a>
-                <a class="dropdown-item" href="#">tamil_extended</a>                                
-                <a class="dropdown-item" href="#">kannada</a>
-                <a class="dropdown-item" href="#">malayalam</a>
-                <a class="dropdown-item" href="#">harvardkyoto</a>  
-                <a class="dropdown-item" href="#">harvardkyoto_tamil</a>                  
-                <a class="dropdown-item" href="#">iso</a> 
-                <a class="dropdown-item" href="#">iast</a>                                                                             
-              </div>
-            </div>
-        </div>
-        <div class="col-sm" id="scriptInputSelected">
-            harvardkyoto
-        </div>  
-        <div class="col-sm">
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown1MenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                output script
-              </button>
-              <div class="dropdown-menu" id="scriptOutputName" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">sanskrit</a>
-                <a class="dropdown-item" href="#">sanskrit_extended</a>                                
-                <a class="dropdown-item" href="#">telugu</a>
-                <a class="dropdown-item" href="#">tamil</a>
-                <a class="dropdown-item" href="#">tamil_extended</a>                
-                <a class="dropdown-item" href="#">kannada</a>
-                <a class="dropdown-item" href="#">malayalam</a>
-                <a class="dropdown-item" href="#">harvardkyoto</a> 
-                <a class="dropdown-item" href="#">harvardkyoto_tamil</a>                                  
-                <a class="dropdown-item" href="#">iso</a> 
-                <a class="dropdown-item" href="#">iast</a>  
-                <a class="dropdown-item" href="#">english</a>                                                                                                              
-              </div>
-            </div>
-        </div>
-        <div class="col-sm" id="scriptOutputSelected">
-            sanskrit
-        </div>                      
-        <div class="col-sm">
-            <button type="button" class="btn btn-primary" 
-                onclick="transliterate_button()">Transliterate</button>
-        </div>
+    <div class="container">
+      <p style="margin-bottom:0.5cm;"></p>
+      <div class="row"> 
+          <div id="GENKBD" class="col-sm">
+          </div>  
+      </div>
     </div>
-    <div class="row">
-        <div class="col-sm">
-            <textarea id="SOURCE" rows="15" cols="80">
-pallavi
-bAla gOpAla pAlayASu mAM
-bhakta vatsala kRpA jaladhE harE
-
-anupallavi
-nIla nIrada SarIra dhIra-tara
-nIraja kara nirupamAnanda-kara
-(madhyama kAla sAhityam)
-lIlayA gOpa vEsha dhara muraLI dhara
-SrI dhara dAmOdara vara
-
-caraNam
-cANUra malla haraNa nipuNa-tara
-caraNa nihata SakaTAsura mura hara
-mANikya makuTa hAra valaya dhara
-mattEbha kumbha bhEdana paTu-tara
-vANISArcita pItAmbara dhara
-vaijayantI vana mAlA dhara
-ANavAdi vijaya mAnasAkara
-apahata kaMsAsura nata bhU-sura
-(madhyama kAla sAhityam)
-drONa karNa duryOdhanAdi hara
-draupadI mAna saMrakshaNa-kara
-vaiNika gAyaka guru guha nuta
-pura vairi vihita gOpikA manOhara          
-            </textarea>
-        </div>  
+    <div class="container">
+      <div class="row">
+          <div class="col-sm">
+              <textarea id="SOURCE" rows="15" cols="80"></textarea>
+          </div>  
+      </div>
     </div>
-    <div class="row"> 
-        <div class="col-sm">
-            <textarea id="TARGET" rows="15" cols="80">          
-            </textarea>
-        </div>    
-    </div>       
-  </div>
+    <div class="container">
+      <div class="row"> 
+          <div class="col-sm">
+              <textarea id="TARGET" rows="15" cols="80">          
+              </textarea>
+          </div>    
+      </div>       
+    </div>
 
+    <script type="text/html" id="lang-key-template">
+        <div id="LANGKBD" class="d-inline-block col-lg-6" tabindex="0" ready="1">
+            <table class="table table-fit">
+            {{#row}}
+            <tr class="keyrow pb-1 d_flex justify-content-center">
+                {{#col}}
+                <td id="key_{{I}}" {{{C}}} class="keycol flex-fill text-center border rounded" onclick="on_key_click()">{{{N}}}</td>
+                {{/col}}
+            </tr>
+            {{/row}}
+            </table>
+       </div>       
+    </script>
 
+    <script type="text/html" id="script-dropdown-template">
+        {{#languages}}
+        <option style="font-size: 12px" {{O}}>{{N}}</option>
+        {{/languages}}
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous" ></script>  
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>      
+    <script src="https://cdn.jsdelivr.net/npm/mustache@3.1.0/mustache.min.js"></script>
     
+    <script type="text/javascript">
+
+    function render_card_template(template_name, id, data) {
+        var ul_template = $(template_name).html();
+        var template_html = Mustache.to_html(ul_template, data);
+        $(id).html(template_html);
+    }
+
+    function get_script_dict(script_list, selected) {
+        let s_list = [];
+        for (var i = 0; i < script_list.length; i++) {
+            var key = script_list[i]
+            if (key == selected) {
+                s_list.push({ 'N' : key, 'O' : 'selected' });
+            } else {
+                s_list.push({ 'N' : key });
+            }
+        }
+        let script_dict = { 'languages' : s_list };
+        return script_dict;
+    }
+
+    const ROW_SIZE = 9;
+
+    function render_keys(lang_dict) {
+        var basic_list = lang_dict['basic'];
+        var combo_list = lang_dict['combo'];
+        var row_list = [];
+        var row = [];
+        var col_id = 1;
+        var info_list = [];
+        for (var i = 0; i < basic_list.length; i++) {
+            if (i > 0 && (i % ROW_SIZE) == 0) {
+                row_list.push({ 'col' : row });
+                row = []
+            }
+            var c = basic_list[i];
+            c = c != '.' ? c : ' ';
+            var info = { 'N' : c, 'K' : c, 'T' : 'key', 'I' : col_id };
+            row.push(info);
+            info_list.push(info);
+            col_id += 1;
+        }
+        var punctuation_list = [ ':', ' ' ];
+        for (var i = 0; i < punctuation_list.length; i++) {
+            var c = punctuation_list[i];
+            var info = { 'N' : c, 'K' : c, 'T' : 'key', 'I' : col_id };
+            row.push(info);
+            info_list.push(info);
+            col_id += 1;
+        }
+        var icon_list = [ 'chevron-expand', 'backspace', 'arrow-return-left' ];
+        var key_name_list = [ 'vowel reset', 'backspace', 'enter' ];
+        if (row.length > 0) {
+            for (var i = 0; i < icon_list.length; i++) {
+                var icon = icon_list[i];
+                var img_str = `<img class="ICON" src="icons/${icon}.svg">`
+                var info = { 'N' : img_str, 'A' : key_name_list[i], 'K' : icon, 'T' : 'icon', 'I' : col_id };
+                row.push(info);
+                info_list.push(info);
+                col_id += 1;
+            }
+            var col_span = ((col_id - 1) % ROW_SIZE) + 1;
+            if (col_span > 1) {
+                row[row.length - 1]['C'] = `colspan="${col_span}"`;
+            }
+            row_list.push({ 'col' : row });
+        }
+        var key_dict = { 'row' : row_list };
+        for (var i = 0; i < info_list.length; i++) {
+            var info_dict = info_list[i];
+            var key_name = info_dict['A'];
+            if (key_name != undefined) {
+                lang_dict[key_name] = 'key_' + info_dict['I'];
+            }
+        }
+        return [info_list, key_dict];
+    }
+
+    const TAMIL_EE = String.fromCharCode(0x0BCD);
+
+    function replace_keys(key_dict, vowel_size, key) {
+        var combo_list = window.parent.script_combo_list;
+        for (var i = 0; i < vowel_size; i++) {
+            var c_key = combo_list[i];
+            if (key == '' || c_key == 0) {
+                var c = key_dict[i]['N'];
+            } else {
+                var c = key + c_key;
+                var p = key.length - 1;
+                if (superscript_code_list.has(key[p])) {
+                    if (c_key.length > 1) {
+                        if (c_key[0] == TAMIL_EE) {
+                            c = key[0] + TAMIL_EE + key.slice(1, key.length) + c_key.slice(1, c_key.length);                         
+                        }                   
+                    } else {
+                        c = key.slice(0, p) + c_key + key[p];
+                    }
+                }
+            }
+            var col_id = '#key_' + (i + 1);
+            $(col_id).html(c);
+        }
+    }
+
+    function on_key_click() {
+       var lang_dict = window.parent.script_lang_dict;
+       var text = $('#SOURCE').val();
+       var element = event.srcElement;
+       if (element.tagName == 'IMG') {
+           event.stopPropagation();
+           element = element.parentElement;
+       }
+       var id = element.getAttribute('id');
+       var nid = parseInt(id.replace(/key_/, ''));
+       var c = element.innerHTML;
+       var f = c.charCodeAt(0);
+       var r_key;
+       if (id == lang_dict['vowel reset']) {
+           r_key = '';
+       } else if (id == lang_dict['backspace']) {
+           if (text.length > 0) {
+               text = text.slice(0, text.length - 1);
+           }
+       } else if (id == lang_dict['enter']) {
+           text += '\n';
+       } else if (window.parent.script_consonant_start <= f && f <= window.parent.script_consonant_end) {
+           var pos = c.length - 1;
+           var r_key = c;
+           var l = text[text.length - pos];
+           if (l != undefined && l.charCodeAt(0) == f) {
+               var p = text.length - 1;
+               if (superscript_code_list.has(text[p])) {
+                   text = text.slice(0, p) + c[pos - 1] + c[pos];
+               } else {
+                   text += c[pos];
+               }
+               r_key = '';
+           } else {
+               if (nid <= lang_dict['vowels'] || c.length > 3) {
+                   r_key = '';
+               }
+               if (c.length > 4) {
+                   text += c.slice(c.length - 3, c.length);
+               } else {
+                   text += c;
+               }
+           }
+       } else {
+           text += c;
+       }
+       if (r_key != undefined) {
+           replace_keys(window.parent.input_key_dict, window.parent.script_vowel_size, r_key);
+       }
+       $('#SOURCE').val(text);
+    };
+
+    function sanskrit_to_indic(base) {
+        let basic_list = []
+        for (var i = 0; i < sanskrit_basic_list.length; i++) {
+            var c = sanskrit_basic_list[i];
+            if (c != '.') {
+                var k = sanskrit_basic_list[i].charCodeAt(0);
+                var l = k + (base - 0x0900);
+                c = String.fromCharCode(l);
+            }
+            basic_list.push(c);
+        }
+        let combo_code_list = [];
+        for (var i = 0; i < sanskrit_basic_list.length; i++) {
+            var c = sanskrit_combo_code_list[i] + (base - 0x0900);
+            combo_code_list.push(c);
+        }
+        let combo_list = combo_code_list.map(i => String.fromCharCode(i));
+        return [ basic_list, combo_list ];
+    }
+
+    function set_input_keyboard(lang) {
+        var lang_dict = lang_key_dict[lang];
+        window.parent.script_lang_dict = lang_dict;
+        window.parent.script_combo_list = lang_dict['combo'];
+        window.parent.script_vowel_size = lang_dict['vowels'];
+        window.parent.script_consonant_base = (lang_dict['base'] != 0) ? (lang_dict['base'] + 0x0015) : 0;
+        window.parent.script_consonant_start = window.parent.script_consonant_base;
+        window.parent.script_consonant_end = window.parent.script_consonant_base + 36;
+        const [info_list, key_dict] = render_keys(lang_dict);
+        window.parent.input_key_dict = info_list;
+        render_card_template('#lang-key-template', '#GENKBD', key_dict);
+    }
+
+    let dropdown_script_list = [ 'tamil', 'tamil_extended', 'sanskrit', 'sanskrit_extended', 'telugu', 'kannada', 'malayalam', 'harvardkyoto', 'harvardkyoto_tamil', 'iso', 'iast', 'english' ];
+
+    var superscript_code_list = [ 0x00B2, 0x00B3, 0x2074 ];
+    superscript_code_list = superscript_code_list.map(i => String.fromCharCode(i));
+    superscript_code_list = new Set(superscript_code_list)
+
+    let tamil_basic_keys = (`அ ஆ இ  ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ ஜ ஷ ஸ ஶ க்ஷ ஹ க ங ச ஞ ட ண த ந ப ம ய ர ல வ ழ ள ற ன  ஃ ௐ ஸ்ரீ`);
+    let tamil_basic_list = tamil_basic_keys.split(/\s+/);
+    let tamil_combo_code_list = [ 0x0BCD, 0x0BBE, 0x0BBF, 0x0BC0, 0x0BC1, 0x0BC2, 0x0BC6, 0x0BC7, 0x0BC8, 0x0BCA, 0x0BCB, 0x0BCC ];
+    let tamil_combo_list = tamil_combo_code_list.map(i => String.fromCharCode(i));
+
+    let tamil_extended_basic_keys = (`அ ஆ இ ஈ உ ஊ ரு² லு² எ ஏ ஐ ஒ ஓ ஔ ரூ³ லூ³ ம்² ம்¹ ஹ¹ ' ௐ ஃ . . . . . க க² க³ க⁴ ங ச ச² ஜ ச⁴ ஞ ட ட² ட³ ட⁴ ண த த² த³ த⁴ ந ன ப ப² ப³ ப⁴ ம ய ர ற ல ள ழ வ ஶ ஷ ஸ ஹ`);
+    let tamil_extended_basic_list = tamil_extended_basic_keys.split(/\s+/);
+    let tamil_extended_combo_template =  'க் கா கி கீ கு கூ க்ரு² க்லு² கெ கே கை கொ கோ கௌ க்ரூ³ க்லூ³  கம்² கம்¹ கஹ¹'.split(/\s+/);
+    let tamil_extended_combo_list = tamil_extended_combo_template.map(i=>i.slice(1, i.length));
+
+    let sanskrit_basic_keys = (`अ आ इ ई उ ऊ ऋ लृ ऎ ए ऐ ऒ ओ औ ॠ लॄ  ँ ं ः ऽ ॐ ग्¹ . . . . . क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न ऩ प फ ब भ म य र ऱ ल ळ ऴ व श ष स ह`);
+    let sanskrit_basic_list = sanskrit_basic_keys.split(/\s+/);
+    let sanskrit_combo_code_list = [ 0x094D, 0x093E, 0x093F, 0x0940, 0x0941, 0x0942, 0x0943, 0x0962, 0x0946, 0x0947, 0x0948, 0x094A, 0x094B, 0x094C, 0x0944, 0x0963, 0x0901, 0x0902, 0x903 ];
+    let sanskrit_combo_list = sanskrit_combo_code_list.map(i => String.fromCharCode(i));
+    
+    const [telugu_basic_list, telugu_combo_list] = sanskrit_to_indic(0x0C00);
+    const [kannada_basic_list, kannada_combo_list] = sanskrit_to_indic(0x0C80);
+    const [malayalam_basic_list, malayalam_combo_list] = sanskrit_to_indic(0x0D00);
+
+    let dummy_combo_list = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+    let harvardkyoto_basic_keys = (`a A i I u U R lR e E ai o O au RR lRR ~ M H ' oM K . . . . . k kh g gh G c ch j jh J T Th D Dh N t th d dh n _n p ph b bh m y r _r l L zh v S sh s h`);
+    let harvardkyoto_basic_list = harvardkyoto_basic_keys.split(/\s+/);
+    let harvardkyoto_combo_list = dummy_combo_list;
+
+    let harvardkyoto_tamil_basic_keys = (`a A i I u U .R l.R  e E ai  o O au .R.R l.R.R ~ M H ' oM K . . . . . k kh g gh G c ch j jh J T Th D Dh N t th d dh n .n p ph b bh m y r  R l L  zh v S sh s h`);
+    let harvardkyoto_tamil_basic_list = harvardkyoto_tamil_basic_keys.split(/\s+/);
+    let harvardkyoto_tamil_combo_list = dummy_combo_list;
+
+    let iso_basic_keys = (`a ā i ī u ū r̥ l̥ e ē ai o ō au r̥̄ l̥̄ m̐ ṁ ḥ ' ōṁ ḵ . . . . . k kh g gh ṅ c ch j jh ñ ṭ ṭh ḍ ḍh ṇ t th d dh n ṉ p ph b bh m y r ṟ l ḷ ḻ v ś ṣ s h`);
+    let iso_basic_list = iso_basic_keys.split(/\s+/);
+    let iso_combo_list = dummy_combo_list;
+
+    let iast_basic_keys = (`a ā i ī u ū ṛ ḷ e ē ai o ō au ṝ ḹ m̐ ṃ ḥ ' oṃ ḵ . . . . . k kh g gh ṅ c ch j jh ñ ṭ ṭh ḍ ḍh ṇ t th d dh n ṉ p ph b bh m y r ṟ l l̤ ḻ v ś ṣ s h`);
+    let iast_basic_list = iast_basic_keys.split(/\s+/);
+    let iast_combo_list = dummy_combo_list;
+
+    let english_basic_keys = (`a A i I u U R lR e E ai o O au RR lRR ~ M H ' oM K . . . . . k kh g gh n c ch j jh n T Th D Dh N t th d dh n n p ph b bh m y r r l L zh v S sh s h`);
+    let english_basic_list = english_basic_keys.split(/\s+/);
+    let english_combo_list = dummy_combo_list;
+
+    var lang_key_dict = { 'tamil' : { 'basic' : tamil_basic_list, 'combo' : tamil_combo_list, 'vowels' : 12, 'base' : 0x0B80 },
+                          'tamil_extended' : { 'basic' : tamil_extended_basic_list, 'combo' : tamil_extended_combo_list,  'vowels' : 19, 'base' : 0x0B80 },
+                          'sanskrit' : { 'basic' : sanskrit_basic_list, 'combo' : sanskrit_combo_list,  'vowels' : 19, 'base' : 0x0900 },
+                          'sanskrit_extended' : { 'basic' : sanskrit_basic_list, 'combo' : sanskrit_combo_list,  'vowels' : 19, 'base' : 0x0900 },
+                          'telugu' : { 'basic' : telugu_basic_list, 'combo' : telugu_combo_list,  'vowels' : 19, 'base' : 0x0C00 },
+                          'kannada' : { 'basic' : kannada_basic_list, 'combo' : kannada_combo_list,  'vowels' : 19, 'base' : 0x0C80 },
+                          'malayalam' : { 'basic' : malayalam_basic_list, 'combo' : malayalam_combo_list,  'vowels' : 19, 'base' : 0x0D00 },
+                          'iso' : { 'basic' : iso_basic_list, 'combo' : iso_combo_list,  'vowels' : 19, 'base' : 0 },
+                          'iast' : { 'basic' : iast_basic_list, 'combo' : iast_combo_list,  'vowels' : 19, 'base' : 0 },
+                          'harvardkyoto_tamil' : { 'basic' : harvardkyoto_tamil_basic_list, 'combo' : harvardkyoto_tamil_combo_list,  'vowels' : 19, 'base' : 0 },
+                          'harvardkyoto' : { 'basic' : harvardkyoto_basic_list, 'combo' : harvardkyoto_combo_list,  'vowels' : 19, 'base' : 0 },
+                          'english' : { 'basic' : english_basic_list, 'combo' : english_combo_list,  'vowels' : 19, 'base' : 0 }
+                        }
+
+    </script>
+
     <script type="text/javascript">
 
     function range(m){
@@ -927,24 +1173,10 @@ ha hA hi hI hu hU h.R hl.R he hE hai ho hO hau h.R.R hl.R.R
                               ['english', harvardkyoto_expanded_list]                                                              
                              ]);  
 
-                                                                                                               
-let ENG_INP_MAP = [' jJ', '\tjJ', '\njJ', 'jJ', 'Jc', 'Jj', 'Mc', 
-    'Mj', 'Mk', 'Mg',  'MT', 'MD', 'Mt', 'Md',
-    'G', '_r', '_n', 'R', 'RR', 'lR', 'lRR', 'M'
-    ];
-
-let ENG_OUT_MAP = [' jn', '\tjn', '\njn', 'gy', 'nc', 'nj', 'nc', 
-            'nj', 'nk', 'ng', 'NT', 'ND', 'nt', 'nd',
-            'n', 'R',  'n', 'ru',
-                     'rU', 'lu', 'lU', 'm'];                             
-
-
     function preprocess_harvardkyoto_to_tamil(input_txt){ 
         let txt = input_txt;                                                        
         txt = txt.replace(/M([cj])/gm, 'J$1');
         txt = txt.replace(/M([kg])/gm, 'G$1');
-        txt = txt.replace(/M([TD])/gm, 'N$1');
-        txt = txt.replace(/M([td])/gm, 'n$1');        
         txt = txt.replace(/\bjJ/gm, 'J'); 
         txt = txt.replace(/jJ/gm, 'JJ'); 
         txt = txt.replace(/Jj/gm, 'Jc');         
@@ -962,8 +1194,6 @@ let ENG_OUT_MAP = [' jn', '\tjn', '\njn', 'gy', 'nc', 'nj', 'nc',
         let txt = input_txt;                                                        
         txt = txt.replace(/M([cj])/gm, 'J$1');
         txt = txt.replace(/M([kg])/gm, 'G$1');
-        txt = txt.replace(/M([TD])/gm, 'N$1');
-        txt = txt.replace(/M([td])/gm, 'n$1');        
         txt = txt.replace(/\bjJ/gm, 'J'); 
         txt = txt.replace(/jJ/gm, 'JJ'); 
         txt = txt.replace(/Jj/gm, 'Jc'); 
@@ -993,7 +1223,10 @@ let ENG_OUT_MAP = [' jn', '\tjn', '\njn', 'gy', 'nc', 'nj', 'nc',
                 result =  transliterate_text(lists_to_map(harvardkyoto_expanded_list,
                     script_output_map.get(strip(scriptOutput))), res); 
                 if (strip(scriptOutput) == 'english') {
-                    result = transliterate_text(lists_to_map(ENG_INP_MAP, ENG_OUT_MAP), result);
+                    result = transliterate_text(lists_to_map([' jJ', '\tjJ', '\njJ', 'jJ', 'Jc', 'Jj', 'Mc', 
+                    'Mj', 'Mk', 'Mg',  'G', '_r', '_n', 'R', 'RR', 'lR', 'lRR', 'M'
+                    ], [' jn', '\tjn', '\njn', 'gy', 'nc', 'nj', 'nc', 'nj', 'nk', 'ng', 'n', 'R',  'n', 'ru',
+                     'rU', 'lu', 'lU', 'm']), result);
                 }                                               
             }         
         } else {  
@@ -1006,7 +1239,10 @@ let ENG_OUT_MAP = [' jn', '\tjn', '\njn', 'gy', 'nc', 'nj', 'nc',
                 let outlist = script_output_map.get(strip(scriptOutput));                                    
                 result = transliterate_text(lists_to_map(inlist, outlist), data);
                 if (strip(scriptOutput) == 'english') {
-                    result = transliterate_text(lists_to_map(ENG_INP_MAP, ENG_OUT_MAP), result);                
+                    result = transliterate_text(lists_to_map([' jJ', '\tjJ', '\njJ', 'jJ', 'Jc', 'Jj', 'Mc', 
+                    'Mj', 'Mk', 'Mg',  'G', '_r', '_n', 'R', 'RR', 'lR', 'lRR', 'M', '~'
+                    ], [' jn', '\tjn', '\njn', 'gy', 'nc', 'nj', 'nc', 'nj', 'nk', 'ng', 'n', 'R',  'n', 'ru',
+                     'rU', 'lu', 'lU', 'm', 'M']), result);
                 }
             }
         }
@@ -1015,8 +1251,6 @@ ${result}
          `;  
         return(p);                           
     }
-
-
     
     function transliterate_text_box(scriptInput, scriptOutput) {
         let source = $('#SOURCE').val();
@@ -1025,8 +1259,32 @@ ${result}
         $('#TARGET').html(target);
     }    
          
+    function set_input_script(obj) {
+        $('#SOURCE').html('');
+        $('#TARGET').html('');
+        window.parent.script_input = obj.value;
+        set_input_keyboard(window.parent.script_input);
+    }
+
+    function set_output_script(obj) {
+        window.parent.script_output = obj.value;
+    }
+    
+    function transliterate_button() {
+        transliterate_text_box(window.parent.script_input, window.parent.script_output);
+    }
         
     function transliterate_init() {
+        window.parent.script_input = 'tamil';
+        window.parent.script_output = 'harvardkyoto_tamil';
+
+        var script_dict = get_script_dict(dropdown_script_list, window.parent.script_input);
+        render_card_template('#script-dropdown-template', '#SCRIPT_INPUT', script_dict);
+        var script_dict = get_script_dict(dropdown_script_list, window.parent.script_output);
+        render_card_template('#script-dropdown-template', '#SCRIPT_OUTPUT', script_dict);
+
+        set_input_keyboard(window.parent.script_input);
+
         let input = document.getElementById('SOURCE');
         input.addEventListener("keyup", function(event) {
             if (event.keyCode === 13) {
@@ -1036,31 +1294,8 @@ ${result}
             }
         });
     } 
-    
-    function transliterate_button(){
-        transliterate_text_box($('#scriptInputSelected').text(), 
-                $('#scriptOutputSelected').text());
-    }
-        
-     $("#scriptInputName a").on("click", function(){
- 
-      var scriptInput = $(this).text(); 
-      var scriptOutput = $('#scriptOutputSelected').text();
-      
-      $('#scriptInputSelected').text(scriptInput);
-      transliterate_text_box(scriptInput, scriptOutput);
-    });  
-     
-     $("#scriptOutputName a").on("click", function(){
- 
-      var scriptInput = $('#scriptInputSelected').text();
-      var scriptOutput = $(this).text(); 
-      
-      $('#scriptOutputSelected').text(scriptOutput);
-      transliterate_text_box(scriptInput, scriptOutput);
-    });   
-        
-    </script> 
+   </script> 
+
    <script type="text/javascript">
         transliterate_init()
     </script>       
