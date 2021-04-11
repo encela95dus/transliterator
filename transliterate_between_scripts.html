@@ -1254,14 +1254,14 @@ ${result}
     
     function transliterate_text_box(scriptInput, scriptOutput) {
         let source = $('#SOURCE').val();
-        $('#TARGET').html(" ");
+        $('#TARGET').val(" ");
         let target = print_transliterator_text(source, scriptInput, scriptOutput);
-        $('#TARGET').html(target);
+        $('#TARGET').val(target);
     }    
          
     function set_input_script(obj) {
         $('#SOURCE').html('');
-        $('#TARGET').html('');
+        $('#TARGET').val('');
         window.parent.script_input = obj.value;
         set_input_keyboard(window.parent.script_input);
     }
